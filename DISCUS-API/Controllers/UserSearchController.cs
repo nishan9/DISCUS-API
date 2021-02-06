@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -118,6 +119,86 @@ namespace DISCUS_API.Controllers
             return new OkObjectResult(result);
         }
 
+
+        [HttpGet("Tags")]
+        public async Task<IActionResult> GetTags()
+        {
+            TagSystem tagSystem = new TagSystem 
+            {
+                Subject = new List<SubjectType>
+                {
+                    new SubjectType
+                    {
+                        Subject = "Biology",
+                        Children = new List<SubjectType>
+                        {
+                            new SubjectType
+                            {
+                                Subject= "Geo",
+                                Children= "null"
+                            },
+                        }
+                    }
+                }
+            };
+
+            tagSystem.Subject.Add(new SubjectType() { Subject = "Physics", Children = "None" });
+            tagSystem.Subject.Add(new SubjectType() { Subject = "Mathematics", Children = "None" });
+
+            return new OkObjectResult(tagSystem);
+        }
+
+        [HttpPost("AddSubject")]
+        public async Task<IActionResult> AddSubject([FromBody] SubjectType newsubject)
+        {
+            TagSystem tagSystem = new TagSystem
+            {
+                Subject = new List<SubjectType>
+                {
+                    new SubjectType
+                    {
+                        Subject = "Biology",
+                        Children = new List<SubjectType>
+                        {
+                            new SubjectType
+                            {
+                                Subject= "Geo",
+                                Children= "null"
+                            },
+                        }
+                    }
+                }
+            };
+            tagSystem.Subject.Add(newsubject); 
+
+            return new OkObjectResult(tagSystem);
+        }
+
+        [HttpPost("AddSubject/{param}")]
+        public async Task<IActionResult> AddTo([FromBody] SubjectType newsubject, string subject)
+        {
+            TagSystem tagSystem = new TagSystem
+            {
+                Subject = new List<SubjectType>
+                {
+                    new SubjectType
+                    {
+                        Subject = "Biology",
+                        Children = new List<SubjectType>
+                        {
+
+                            new SubjectType
+                            {
+                                Subject = newsubject.Subject,
+                                Children = newsubject.Children
+                            }
+                        }
+                    },
+                }
+            };
+
+            return new OkObjectResult(tagSystem);
+        }
 
     }
 }
