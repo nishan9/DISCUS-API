@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 
@@ -15,6 +16,9 @@ namespace DISCUS_API
             [JsonProperty("dateTime")]
             public string DateTime { get; set; }
 
+            [JsonProperty("finishedDateTime")]
+            public string FinishedDateTime { get; set; }
+
             [JsonProperty("type")]
             public string Type { get; set;  }
 
@@ -26,5 +30,11 @@ namespace DISCUS_API
 
             [JsonProperty("isDISCUS")]
             public bool IsDISCUS { get; set; }
+
+            [JsonProperty("isApproved")]
+            public bool IsApproved { get; set; }
+
+            [JsonProperty("tags")]
+            public string Tags { get; set; }
     }
 }

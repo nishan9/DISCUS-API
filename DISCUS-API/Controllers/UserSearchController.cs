@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 using DISCUS_API.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -43,10 +44,9 @@ namespace DISCUS_API.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetOneUser(string id)
         {
-            string auth0id = "auth0|" + id;
             HttpRequestMessage req = new HttpRequestMessage
             {
-                RequestUri = new Uri($"https://discus.eu.auth0.com/api/v2/users/{auth0id}")
+                RequestUri = new Uri($"https://discus.eu.auth0.com/api/v2/users/{id}")
             };
             req.Headers.Add("Authorization", $"Bearer {auth0settings.Auth0ManagmentKey}");
             HttpResponseMessage res = await client.SendAsync(req);
@@ -55,6 +55,24 @@ namespace DISCUS_API.Controllers
             return new OkObjectResult(result);
 
         }
+        [Authorize]
+        [HttpPatch]
+        public async Task<IActionResult> UpdateUser([FromBody] User newuser)
+        {
+            string jwt = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            HttpRequestMessage req = new HttpRequestMessage
+            {
+                RequestUri = new Uri($"https://discus.eu.auth0.com/api/v2/users/{jwt}"),
+                Content = new StringContent(JsonConvert.SerializeObject(newuser), Encoding.UTF8, "application/json")
+        };
+            req.Headers.Add("Authorization", $"Bearer {auth0settings.Auth0ManagmentKey}");
+            HttpResponseMessage res = await client.SendAsync(req);
+            string jsonString = await res.Content.ReadAsStringAsync();
+            User result = JsonConvert.DeserializeObject<User>(jsonString);
+            return new OkObjectResult(result);
+        }
+
+
 
         [HttpGet("Search/{name}/{page}")]
         public async Task<IActionResult> GetPageUser(string name, int page)
@@ -91,7 +109,7 @@ namespace DISCUS_API.Controllers
             {
                 HttpRequestMessage req = new HttpRequestMessage
                 {
-                    RequestUri = new Uri($"https://discus.eu.auth0.com/api/v2/users?page={page}&per_page=10&include_totals=true&q={filter}&search_engine=v3")
+                    RequestUri = new Uri($"https://discus.eu.auth0.com/api/v2/users?q={filter}&search_engine=v3&include_totals=true&page=0&per_page=10")
                 };
 
                 req.Headers.Add("Authorization", $"Bearer {auth0settings.Auth0ManagmentKey}");
@@ -119,86 +137,53 @@ namespace DISCUS_API.Controllers
             return new OkObjectResult(result);
         }
 
-
-        [HttpGet("Tags")]
-        public async Task<IActionResult> GetTags()
+        [Authorize]
+        [HttpPatch("Me")]
+        public async Task<IActionResult> PublishMe([FromBody] Metadata newuser)
         {
-            TagSystem tagSystem = new TagSystem 
+            string jwt = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            HttpRequestMessage req = new HttpRequestMessage
             {
-                Subject = new List<SubjectType>
-                {
-                    new SubjectType
-                    {
-                        Subject = "Biology",
-                        Children = new List<SubjectType>
-                        {
-                            new SubjectType
-                            {
-                                Subject= "Geo",
-                                Children= "null"
-                            },
-                        }
-                    }
-                }
+                RequestUri = new Uri($"https://discus.eu.auth0.com/api/v2/users/{jwt}"),
+                Content = new StringContent(JsonConvert.SerializeObject(newuser), Encoding.UTF8, "application/json"),
+                Method = HttpMethod.Patch
             };
-
-            tagSystem.Subject.Add(new SubjectType() { Subject = "Physics", Children = "None" });
-            tagSystem.Subject.Add(new SubjectType() { Subject = "Mathematics", Children = "None" });
-
-            return new OkObjectResult(tagSystem);
+            req.Headers.Add("Authorization", $"Bearer {auth0settings.Auth0ManagmentKey}");
+            HttpResponseMessage res = await client.SendAsync(req);
+            string jsonString = await res.Content.ReadAsStringAsync();
+            User result = JsonConvert.DeserializeObject<User>(jsonString);
+            return new OkObjectResult(result);
         }
 
-        [HttpPost("AddSubject")]
-        public async Task<IActionResult> AddSubject([FromBody] SubjectType newsubject)
+        [Authorize]
+        [HttpPatch("UpdateUser/{id}")]
+        public async Task<IActionResult> UpdateUserProfile([FromBody] UpdateUser newuser, string id)
         {
-            TagSystem tagSystem = new TagSystem
+            HttpRequestMessage req = new HttpRequestMessage
             {
-                Subject = new List<SubjectType>
-                {
-                    new SubjectType
-                    {
-                        Subject = "Biology",
-                        Children = new List<SubjectType>
-                        {
-                            new SubjectType
-                            {
-                                Subject= "Geo",
-                                Children= "null"
-                            },
-                        }
-                    }
-                }
+                RequestUri = new Uri($"https://discus.eu.auth0.com/api/v2/users/{id}"),
+                Content = new StringContent(JsonConvert.SerializeObject(newuser), Encoding.UTF8, "application/json"),
+                Method = HttpMethod.Patch
             };
-            tagSystem.Subject.Add(newsubject); 
-
-            return new OkObjectResult(tagSystem);
+            req.Headers.Add("Authorization", $"Bearer {auth0settings.Auth0ManagmentKey}");
+            HttpResponseMessage res = await client.SendAsync(req);
+            string jsonString = await res.Content.ReadAsStringAsync();
+            User result = JsonConvert.DeserializeObject<User>(jsonString);
+            return new OkObjectResult(result);
         }
-
-        [HttpPost("AddSubject/{param}")]
-        public async Task<IActionResult> AddTo([FromBody] SubjectType newsubject, string subject)
+        [HttpGet("EventAttendance/{id}")]
+        public async Task<IActionResult> UpdateUserProfile(int id)
         {
-            TagSystem tagSystem = new TagSystem
+            HttpRequestMessage req = new HttpRequestMessage
             {
-                Subject = new List<SubjectType>
-                {
-                    new SubjectType
-                    {
-                        Subject = "Biology",
-                        Children = new List<SubjectType>
-                        {
-
-                            new SubjectType
-                            {
-                                Subject = newsubject.Subject,
-                                Children = newsubject.Children
-                            }
-                        }
-                    },
-                }
+                RequestUri = new Uri($"https://discus.eu.auth0.com/api/v2/users?q=user_metadata.events:{id}&include_totals=true&fields=total,name,picture,email,user_metadata.expertise,user_metadata.interest&include_fields=true"),
             };
-
-            return new OkObjectResult(tagSystem);
+            req.Headers.Add("Authorization", $"Bearer {auth0settings.Auth0ManagmentKey}");
+            HttpResponseMessage res = await client.SendAsync(req);
+            string jsonString = await res.Content.ReadAsStringAsync();
+            EventAttendance result = JsonConvert.DeserializeObject<EventAttendance>(jsonString);
+            return new OkObjectResult(result);
         }
-
+        
     }
 }
