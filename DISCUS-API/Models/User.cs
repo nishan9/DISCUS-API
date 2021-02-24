@@ -41,30 +41,74 @@ namespace DISCUS_API.Models
 
         [JsonProperty("logins_count")]
         public int Logins_count { get; set; }
+
+        [JsonProperty("app_metadata")]
+        public AppMetadata App_metadata { get; set; }
+
+    }
+
+    public class AppMetadata
+    {
+        [JsonProperty("isAdmin")]
+        public Boolean isAdmin { get; set; }
     }
 
     public class UserMetadata
     {
-        [JsonProperty("career_stage")]
-        public string Career_stage { get; set; }
+        [JsonProperty("social")]
+        public Social Social { get; set; }
 
-        [JsonProperty("department")]
-        public string Department { get; set; }
+        [JsonProperty("education")]
+        public Education Education { get; set; }
 
-        [JsonProperty("linkedin")]
-        public string Linkedin { get; set; }
+        [JsonProperty("research")]
+        public string Research { get; set; }
 
-        [JsonProperty("research_interests")]
-        public string Research_interests { get; set; }
+        [JsonProperty("expertise")]
+        public List<string> Expertise { get; set; }
 
-        [JsonProperty("school")]
-        public string School { get; set; }
+        [JsonProperty("interest")]
+        public List<string> Interest { get; set; }
 
-        [JsonProperty("sussex")]
-        public string Sussex { get; set; }
+        [JsonProperty("events")]
+        public List<int> Events { get; set; }
 
-        [JsonProperty("tags")]
-        public List<string> Tags { get; set; }
+    }
+
+    public class Metadata
+    {
+        [JsonProperty("user_metadata")]
+        public UserMetadata User_metadata { get; set; }
+    }
+
+    public class UpdateUser
+    {
+        [JsonProperty("name")]
+        public string Name { get; set; }
+
+        [JsonProperty("user_metadata")]
+        public UserMetadata User_metadata { get; set; }
+
+    }
+
+
+    public class Social
+    {
+        public string sussex { get; set;  }
+    }
+
+    public class Education
+    {
+        public string school { get; set;  }
+
+        public string Department { get; set;  }
+
+        public string CareerStage { get; set;  }
+
+        public string GraduationDate { get; set;  }
+
+        public string Available { get; set;  }
+
     }
 
 }

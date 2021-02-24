@@ -21,14 +21,14 @@ namespace DISCUS_API.Controllers
         public async Task<IActionResult> GetAllEvents()
         {
 
-            List<EventEntity> Entity = await context.EventEntity.ToListAsync();
+            List<EventEntity> Entity = await context.EventEntity.OrderBy(e => e.DateTime).ToListAsync();
             return new OkObjectResult(Entity);
         }
 
-        [HttpGet("{name}")]
-        public async Task<IActionResult> Get(string name)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetSpecificEvent(int id)
         {
-            EventEntity eventEntity = context.EventEntity.Where(x => x.Title == name).FirstOrDefault();
+            EventEntity eventEntity = context.EventEntity.Where(x => x.Id == id).FirstOrDefault();
             if (eventEntity != null)
             {
                 return new OkObjectResult(eventEntity);
@@ -59,7 +59,9 @@ namespace DISCUS_API.Controllers
                 eventEntity.URL = neweventEntity.URL;
                 eventEntity.IsDISCUS = neweventEntity.IsDISCUS;
                 eventEntity.Description = neweventEntity.Description;
-                eventEntity.DateTime = neweventEntity.DateTime; 
+                eventEntity.DateTime = neweventEntity.DateTime;
+                eventEntity.Tags = neweventEntity.Tags;
+                eventEntity.FinishedDateTime = neweventEntity.FinishedDateTime; 
 
                 await context.SaveChangesAsync();
                 return new OkObjectResult(eventEntity); 
@@ -77,7 +79,6 @@ namespace DISCUS_API.Controllers
             context.EventEntity.Remove(eventEntity);
             await context.SaveChangesAsync();
             return new OkResult();
-
         }
 
     }
