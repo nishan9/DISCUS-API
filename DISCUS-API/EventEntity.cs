@@ -14,10 +14,10 @@ namespace DISCUS_API
             public string Title { get; set; }
 
             [JsonProperty("dateTime")]
-            public string DateTime { get; set; }
+            public DateTime DateTime { get; set; }
 
             [JsonProperty("finishedDateTime")]
-            public string FinishedDateTime { get; set; }
+            public DateTime FinishedDateTime { get; set; }
 
             [JsonProperty("type")]
             public string Type { get; set;  }

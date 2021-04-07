@@ -95,6 +95,8 @@ namespace DISCUS_API.Models
     public class Social
     {
         public string sussex { get; set;  }
+
+        public string linkedIn { get; set; }
     }
 
     public class Education

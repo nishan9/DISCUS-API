@@ -52,7 +52,8 @@ namespace DISCUS_API
             }); 
             services.AddDbContext<DataContext>(x => x.UseSqlServer(Configuration.GetConnectionString("DISCUSDB")));
             services.AddHttpClient<UserSearchController, UserSearchController>(); 
-            services.Configure<Auth0Settings>(Configuration); 
+            services.Configure<Auth0Settings>(Configuration);
+            services.Configure<SendGridSettings>(Configuration); 
             services.AddControllers();
         }
 
