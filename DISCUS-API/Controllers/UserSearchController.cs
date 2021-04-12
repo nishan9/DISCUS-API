@@ -16,7 +16,7 @@ using SendGrid.Helpers.Mail;
 namespace DISCUS_API.Controllers
 {
 
-    
+    [Authorize]
     [Route("[controller]")]
     [ApiController]
     public class UserSearchController : Controller
@@ -62,7 +62,6 @@ namespace DISCUS_API.Controllers
 
         }
 
-        [Authorize]
         [HttpPatch]
         public async Task<IActionResult> UpdateUser([FromBody] User newuser)
         {
@@ -110,6 +109,7 @@ namespace DISCUS_API.Controllers
             return new OkObjectResult(result);
 
         }
+
         [HttpGet("Page/{page}/{filter}")]
         public async Task<IActionResult> GetPage(int page, string filter)
         {
@@ -160,7 +160,7 @@ namespace DISCUS_API.Controllers
 
         [Authorize]
         [HttpPatch("Me")]
-        public async Task<IActionResult> PublishMe([FromBody] Metadata newuser)
+        public async Task<IActionResult> UpdateMe([FromBody] Metadata newuser)
         {
             string jwt = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             HttpRequestMessage req = new HttpRequestMessage

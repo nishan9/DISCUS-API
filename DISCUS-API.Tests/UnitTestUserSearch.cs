@@ -35,13 +35,20 @@ namespace DISCUS_API.Tests
         }
 
         [Test]
-        public async Task Test1()
+        public async Task TestGetAllUsers()
         {
-            UserMetadata fakeMetadata = new UserMetadata { Research = "lorem", Events = [2,3], Expertise = new List<int>(new int[] { 1, 2, 3 }) , Interest = ["dsds"] Social = { linkedIn = "linkedin" , sussex = "sussex" }, Education = { Available = "true", CareerStage = "UG", Department = "Inf", GraduationDate = "2222", school = "School of EngInf" } }; 
+            Social fakeSocial = new Social { linkedIn = "linkedin", sussex = "rere" };
+            Education fakeEducation = new Education { school = "fd", Available = "", CareerStage = "", Department = "", GraduationDate = "" };
+            List<string> tags = new List<string>();
+            tags.Add("gdGFD");
+            List<int> events = new List<int>();
+            events.Add(23);
+            UserMetadata userMetadata = new UserMetadata { Social = fakeSocial, Education = fakeEducation, Research = "fdsds", Expertise = tags, Interest = tags, Events = events };
+            User fakeUser = new User { Email = "nishan@iclodu.com" , User_metadata = userMetadata};
+            List<User> fakeUserList = new List<User>();
+            fakeUserList.Add(fakeUser);
+            UserSearch fakeSearch = new UserSearch { Length = 12, Limit = 23, Start = 2, Total = 2, Users = fakeUserList }; 
 
-            User FakeUser = new User { User_id = "linkedIn|3232", }
-
-            UserSearch fakeSearch = new UserSearch { Start = 1, Length = 2, Limit = 3, Total = 3, Users = new List<User>({ new User { email = "nishan9@icloud.com" } }) }; 
 
             mockhttpclient
                 .Protected()
@@ -52,8 +59,124 @@ namespace DISCUS_API.Tests
                     "application/json")
                 }));
 
-            var result = mockController.GetAllUsers();
-            Assert.Pass(); 
+            ObjectResult result = await mockController.GetAllUsers() as ObjectResult;
+            UserSearch Actual = result.Value as UserSearch; 
+            Assert.AreEqual(Actual.Length, fakeSearch.Length); 
+        }
+
+        [Test]
+        public async Task TestGetOneUser()
+        {
+            Social fakeSocial = new Social { linkedIn = "linkedin", sussex = "rere" };
+            Education fakeEducation = new Education { school = "fd", Available = "", CareerStage = "", Department = "", GraduationDate = "" };
+            List<string> tags = new List<string>();
+            tags.Add("gdGFD");
+            List<int> events = new List<int>();
+            events.Add(23);
+            UserMetadata userMetadata = new UserMetadata { Social = fakeSocial, Education = fakeEducation, Research = "fdsds", Expertise = tags, Interest = tags, Events = events };
+            User fakeUser = new User { Email = "nishan@iclodu.com", User_metadata = userMetadata, User_id = "linkedIn|3232" };
+            
+
+            mockhttpclient
+                .Protected()
+                .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>()).Returns(Task.FromResult(new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent(JsonConvert.SerializeObject(fakeUser),
+                    Encoding.UTF8,
+                    "application/json")
+                }));
+
+            ObjectResult result = await mockController.GetOneUser("linkedIn|3232") as ObjectResult;
+            User Actual = result.Value as User;
+            Assert.AreEqual(Actual.Name, fakeUser.Name);
+        }
+
+        [Test]
+        public async Task TestUpdateUser()
+        {
+            Social fakeSocial = new Social { linkedIn = "linkedin", sussex = "rere" };
+            Education fakeEducation = new Education { school = "fd", Available = "", CareerStage = "", Department = "", GraduationDate = "" };
+            List<string> tags = new List<string>();
+            tags.Add("gdGFD");
+            List<int> events = new List<int>();
+            events.Add(23);
+            UserMetadata userMetadata = new UserMetadata { Social = fakeSocial, Education = fakeEducation, Research = "fdsds", Expertise = tags, Interest = tags, Events = events };
+            User fakeUser = new User { Email = "nishan@iclodu.com", User_metadata = userMetadata, User_id = "linkedIn|3232" };
+
+
+            mockhttpclient
+                .Protected()
+                .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>()).Returns(Task.FromResult(new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent(JsonConvert.SerializeObject(fakeUser),
+                    Encoding.UTF8,
+                    "application/json")
+                }));
+
+            ObjectResult result = await mockController.UpdateUser(fakeUser) as ObjectResult;
+            User Actual = result.Value as User;
+            Assert.AreEqual(Actual, fakeUser);
+        }
+
+        [Test]
+        public async Task TestDeleteUser()
+        {
+            Social fakeSocial = new Social { linkedIn = "linkedin", sussex = "rere" };
+            Education fakeEducation = new Education { school = "fd", Available = "", CareerStage = "", Department = "", GraduationDate = "" };
+            List<string> tags = new List<string>();
+            tags.Add("gdGFD");
+            List<int> events = new List<int>();
+            events.Add(23);
+            UserMetadata userMetadata = new UserMetadata { Social = fakeSocial, Education = fakeEducation, Research = "fdsds", Expertise = tags, Interest = tags, Events = events };
+            User fakeUser = new User { Email = "nishan@iclodu.com", User_metadata = userMetadata, User_id = "linkedIn|3232" };
+
+
+            mockhttpclient
+                .Protected()
+                .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>()).Returns(Task.FromResult(new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent(JsonConvert.SerializeObject(fakeUser),
+                    Encoding.UTF8,
+                    "application/json")
+                }));
+
+            ObjectResult result = await mockController.DeleteUser("linkedIn|3232") as ObjectResult;
+            User Actual = result.Value as User;
+            Assert.AreEqual(Actual.Name, fakeUser.Name);
+        }
+
+        [Test]
+        public async Task TestGetPageUser()
+        {
+            Social fakeSocial = new Social { linkedIn = "linkedin", sussex = "rere" };
+            Education fakeEducation = new Education { school = "fd", Available = "", CareerStage = "", Department = "", GraduationDate = "" };
+            List<string> tags = new List<string>();
+            tags.Add("gdGFD");
+            List<int> events = new List<int>();
+            events.Add(23);
+            UserMetadata userMetadata = new UserMetadata { Social = fakeSocial, Education = fakeEducation, Research = "fdsds", Expertise = tags, Interest = tags, Events = events };
+            User fakeUser = new User { Email = "nishan@iclodu.com", User_metadata = userMetadata };
+            List<User> fakeUserList = new List<User>();
+            fakeUserList.Add(fakeUser);
+            UserSearch fakeSearch = new UserSearch { Length = 12, Limit = 23, Start = 2, Total = 2, Users = fakeUserList };
+
+
+            mockhttpclient
+                .Protected()
+                .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>()).Returns(Task.FromResult(new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent(JsonConvert.SerializeObject(fakeSearch),
+                    Encoding.UTF8,
+                    "application/json")
+                }));
+
+            ObjectResult result = await mockController.GetPageUser("Nishan",0) as ObjectResult;
+            UserSearch Actual = result.Value as UserSearch;
+            Assert.AreEqual(Actual.Length, fakeSearch.Length);
         }
 
     }
