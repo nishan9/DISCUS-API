@@ -13,6 +13,7 @@ using Newtonsoft.Json;
 
 namespace DISCUS_API.Controllers
 {
+    [Authorize]
     [Route("[controller]")]
     [ApiController]
     public class EventEntityController : ControllerBase
