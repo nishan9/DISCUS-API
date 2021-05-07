@@ -33,6 +33,10 @@ namespace DISCUS_API.Controllers
             this.sendGridSettings = sendGridSettings.Value; 
         }
 
+        /// <summary>
+        /// Retrieves all users from Auth0
+        /// </summary>
+        /// <returns>UserSearch obejct with Users</returns>
         [HttpGet]
         public async Task<IActionResult> GetAllUsers()
         {
@@ -47,6 +51,11 @@ namespace DISCUS_API.Controllers
             return new OkObjectResult(result); 
         }
 
+        /// <summary>
+        /// Retrieves details of one specific user
+        /// </summary>
+        /// <param name="id">User ID</param>
+        /// <returns>Retrives the User object will all relevant information</returns>
         [HttpGet("{id}")]
         public async Task<IActionResult> GetOneUser(string id)
         {
@@ -62,6 +71,11 @@ namespace DISCUS_API.Controllers
 
         }
 
+        /// <summary>
+        /// Updates the User with the information in the body in Auth0. 
+        /// </summary>
+        /// <param name="newuser">User object is JSON</param>
+        /// <returns>The returned user object after manipulation</returns>
         [HttpPatch]
         public async Task<IActionResult> UpdateUser([FromBody] User newuser)
         {
@@ -78,6 +92,11 @@ namespace DISCUS_API.Controllers
             return new OkObjectResult(result);
         }
 
+        /// <summary>
+        /// Deletes a specific user with the id in Auth0.  
+        /// </summary>
+        /// <param name="id">User ID</param>
+        /// <returns>Returns the deleted user</returns>
         [HttpDelete("Delete/{id}")]
         public async Task<IActionResult> DeleteUser(string id)
         {
@@ -93,13 +112,18 @@ namespace DISCUS_API.Controllers
             return new OkObjectResult(result);
         }
 
-
+        /// <summary>
+        /// Retrieves search result for the specific page given the search parameter as JSON with up to 50 each time.
+        /// </summary>
+        /// <param name="name">Query Parameter</param>
+        /// <param name="page">Page Number</param>
+        /// <returns></returns>
         [HttpGet("Search/{name}/{page}")]
-        public async Task<IActionResult> GetPageUser(string name, int page)
+        public async Task<IActionResult> GetPageUser(string query, int page)
         {
             HttpRequestMessage req = new HttpRequestMessage
             {
-                RequestUri = new Uri($"https://discus.eu.auth0.com/api/v2/users?page={page}&per_page=10&include_totals=true&q={name}&search_engine=v3")
+                RequestUri = new Uri($"https://discus.eu.auth0.com/api/v2/users?page={page}&per_page=10&include_totals=true&q={query}&search_engine=v3")
             };
             
             req.Headers.Add("Authorization", $"Bearer {auth0settings.Auth0ManagmentKey}");
@@ -110,6 +134,12 @@ namespace DISCUS_API.Controllers
 
         }
 
+        /// <summary>
+        /// Retrieves search result for the specific page given the search parameter as JSON with up to 50 each time and if specified ALL will resort to no query applied.
+        /// </summary>
+        /// <param name="page">Page Number</param>
+        /// <param name="filter">Search Filter</param>
+        /// <returns></returns>
         [HttpGet("Page/{page}/{filter}")]
         public async Task<IActionResult> GetPage(int page, string filter)
         {
@@ -142,7 +172,10 @@ namespace DISCUS_API.Controllers
             }
         }
 
-        [Authorize]
+        /// <summary>
+        /// Retrieves user information specified in the JWT Token from Auth0. 
+        /// </summary>
+        /// <returns>The user object</returns>
         [HttpGet("Me")]
         public async Task<IActionResult> GetMe()
         {
@@ -158,7 +191,11 @@ namespace DISCUS_API.Controllers
             return new OkObjectResult(result);
         }
 
-        [Authorize]
+        /// <summary>
+        /// Update the user of the Authorization token
+        /// </summary>
+        /// <param name="newuser"> Metadata that will be replaced with</param>
+        /// <returns></returns>
         [HttpPatch("Me")]
         public async Task<IActionResult> UpdateMe([FromBody] Metadata newuser)
         {
@@ -176,7 +213,12 @@ namespace DISCUS_API.Controllers
             return new OkObjectResult(result);
         }
 
-        [Authorize]
+        /// <summary>
+        /// Updates the supplied user in Auth0 
+        /// </summary>
+        /// <param name="newuser">The deatils to be updated in JSON</param>
+        /// <param name="id">Auth0 User ID</param>
+        /// <returns></returns>
         [HttpPatch("UpdateUser/{id}")]
         public async Task<IActionResult> UpdateUserProfile([FromBody] UpdateUser newuser, string id)
         {
@@ -192,7 +234,10 @@ namespace DISCUS_API.Controllers
             User result = JsonConvert.DeserializeObject<User>(jsonString);
             return new OkObjectResult(result);
         }
-
+        /// <summary>
+        /// Restructures Auth0 user's expertise into a model for be graphed
+        /// </summary>
+        /// <returns>JSON data for a piechart</returns>
         [HttpGet("PieChart/Expertise")]
         public async Task<IActionResult> GetExpertTags()
         {
@@ -228,7 +273,10 @@ namespace DISCUS_API.Controllers
             var top10 = response.OrderByDescending(o => o.Value).Take(10);
             return new OkObjectResult(top10);
         }
-
+        /// <summary>
+        /// Restructures the data from Auth0 to a model to graph as a pie chart
+        /// </summary>
+        /// <returns>A list of interest tags with their corresponding count</returns>
         [HttpGet("PieChart/Interest")]
         public async Task<IActionResult> GetInterestTags()
         {
@@ -267,10 +315,13 @@ namespace DISCUS_API.Controllers
 
             return new OkObjectResult(top10);
         }
-
-
+        /// <summary>
+        /// Retrieves the numbers of users with the supplied event ID
+        /// </summary>
+        /// <param name="id">Event ID</param>
+        /// <returns>Users attending the specific event</returns>
         [HttpGet("EventAttendance/{id}")]
-        public async Task<IActionResult> UpdateUserProfile(int id)
+        public async Task<IActionResult> GetAttendance(int id)
         {
             HttpRequestMessage req = new HttpRequestMessage
             {
@@ -283,6 +334,10 @@ namespace DISCUS_API.Controllers
             return new OkObjectResult(result);
         }
 
+        /// <summary>
+        /// Retrieves number of active users from Auth0. 
+        /// </summary>
+        /// <returns>Retrieves the number</returns>
         [HttpGet("ActiveUsers")]
         public async Task<IActionResult> GetActiveUsers()
         {
@@ -296,7 +351,10 @@ namespace DISCUS_API.Controllers
             int result = JsonConvert.DeserializeObject<int>(jsonString);
             return new OkObjectResult(result);
         }
-
+        /// <summary>
+        /// Retrieves the total number of users. 
+        /// </summary>
+        /// <returns>Returns the number of users</returns>
         [HttpGet("TotalUsers")]
         public async Task<IActionResult> GetTotalUsers()
         {
@@ -311,7 +369,10 @@ namespace DISCUS_API.Controllers
             int total = result.total; 
             return new OkObjectResult(total);
         }
-
+        /// <summary>
+        /// Retrives a list of emails of all the users from Auth0
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("GetEmails")]
         public async Task<IActionResult> GetEmailsAll()
         {
@@ -328,26 +389,28 @@ namespace DISCUS_API.Controllers
             return new OkObjectResult(result);
         }
 
-
+        /// <summary>
+        /// Sends an email with SendGrid client. 
+        /// </summary>
+        /// <param name="newemail"></param>
+        /// <returns></returns>
         [HttpPost("SendEmail")]
         public async Task<IActionResult> SendEmail([FromBody] Email newemail)
         {
-
             var client = new SendGridClient(sendGridSettings.SENDGRID_API_KEY);
-            var from = new EmailAddress("no-reply@discuslabs.co.uk", "DISCUS");
+            var from = new EmailAddress("admin@discuslinks.co.uk", "DISCUS");
             var subject = newemail.Subject; 
             var plainTextContent = "";
             var htmlContent = newemail.Body;
             List<EmailAddress> tos = newemail.Recipients; 
-
             var msg = MailHelper.CreateSingleEmailToMultipleRecipients(from, tos, subject, plainTextContent, htmlContent);
-
             var response = await client.SendEmailAsync(msg);
             return new OkObjectResult(response);
         }
-
-
-
+        /// <summary>
+        /// Retrieves data of users' schools and departments which is restructured into a Nivo model of a stacked bar chart. 
+        /// </summary>
+        /// <returns>The number of users per school per department</returns>
         [HttpGet("Chart")]
         public async Task<IActionResult> SchoolDepList()
         {
@@ -499,7 +562,5 @@ namespace DISCUS_API.Controllers
 
             return new OkObjectResult(AllSchools);
         }
-
-
     }
 }

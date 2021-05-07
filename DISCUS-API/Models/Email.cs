@@ -15,6 +15,5 @@ namespace DISCUS_API.Models
 
         [JsonProperty("body")]
         public string Body { get; set; }
-
     }
 }
