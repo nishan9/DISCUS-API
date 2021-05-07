@@ -29,6 +29,10 @@ namespace DISCUS_API.Controllers
             this.auth0settings = auth0settings.Value;
         }
 
+        /// <summary>
+        /// Retrieves events that are approved and before the current date in descending order. 
+        /// </summary>
+        /// <returns> List of event objects</returns>
         [HttpGet("Upcoming")]
         public async Task<IActionResult> GetUpcomingEvents()
         {
@@ -37,6 +41,10 @@ namespace DISCUS_API.Controllers
             return new OkObjectResult(Entity);
         }
 
+        /// <summary>
+        /// Retrieves events that are approved and after the current date in descending order. 
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("Past")]
         public async Task<IActionResult> GetPastEvents()
         {
@@ -45,6 +53,10 @@ namespace DISCUS_API.Controllers
             return new OkObjectResult(Entity);
         }
 
+        /// <summary>
+        /// Retrieves the number of events. 
+        /// </summary>
+        /// <returns>Total event count</returns>
         [HttpGet("Count")]
         public async Task<IActionResult> CountEvents()
         {
@@ -53,6 +65,11 @@ namespace DISCUS_API.Controllers
             return new OkObjectResult(Entity.Count());
         }
 
+        /// <summary>
+        /// Retrieves a specific event object. 
+        /// </summary>
+        /// <param name="id"> Event ID number</param>
+        /// <returns> Event object</returns>
         [HttpGet("{id}")]
         public async Task<IActionResult> GetSpecificEvent(int id)
         {
@@ -67,6 +84,11 @@ namespace DISCUS_API.Controllers
             }
         }
 
+        /// <summary>
+        /// Creates a new event in the database. 
+        /// </summary>
+        /// <param name="eventEntity">Event object</param>
+        /// <returns>The saved object</returns>
         [HttpPost]
         public async Task<IActionResult> CreateEventEntity([FromBody] EventEntity eventEntity)
         {
@@ -75,6 +97,12 @@ namespace DISCUS_API.Controllers
             return new OkObjectResult(eventEntity);
         }
 
+        /// <summary>
+        /// Updates a specific event. 
+        /// </summary>
+        /// <param name="neweventEntity">Event</param>
+        /// <param name="id">Event ID number</param>
+        /// <returns>Event object</returns>
         [HttpPost("{id}")]
         public async Task<IActionResult> UpdateEventEntity([FromBody] EventEntity neweventEntity, int id)
         {
@@ -100,16 +128,24 @@ namespace DISCUS_API.Controllers
             }
         }
 
+        /// <summary>
+        /// Deletes a specific event
+        /// </summary>
+        /// <param name="id"> Event ID</param>
+        /// <returns> The deleted object</returns>
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEventEntity(int id)
         {
-            EventEntity eventEntity = new EventEntity() { Id = id };
-            context.EventEntity.Attach(eventEntity);
+            EventEntity eventEntity = context.EventEntity.Where(x => x.Id == id).FirstOrDefault();
             context.EventEntity.Remove(eventEntity);
-            await context.SaveChangesAsync();
+            context.SaveChanges(); 
             return new OkObjectResult(eventEntity);
         }
 
+        /// <summary>
+        /// Retrieves any events that need to be approved
+        /// </summary>
+        /// <returns>List of EventEntity that is yet to be approved</returns>
         [HttpGet("Unauthorized")]
         public async Task<IActionResult> GetEventToApprove()
         {
@@ -117,6 +153,11 @@ namespace DISCUS_API.Controllers
             return new OkObjectResult(Entity);
         }
 
+        /// <summary>
+        /// Approves a specific event
+        /// </summary>
+        /// <param name="id">Event ID</param>
+        /// <returns>Success or Permission Denied</returns>
         [Authorize]
         [HttpPatch("Approve/{id}")]
         public async Task<IActionResult> GetEventToApprove(int id)
@@ -130,6 +171,7 @@ namespace DISCUS_API.Controllers
             HttpResponseMessage res = await client.SendAsync(req);
             string jsonString = await res.Content.ReadAsStringAsync();
             Auth0Permissions[] permission = JsonConvert.DeserializeObject<Auth0Permissions[]>(jsonString);
+
             if (permission[0].Sources[0].Source_name == "Admin")
             {
                 EventEntity result = (from p in context.EventEntity where p.Id == id select p).SingleOrDefault();

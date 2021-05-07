@@ -8,6 +8,7 @@ namespace DISCUS_API.Models
         [JsonProperty("sources")]
         public Sources[] Sources { get; set; }
     }
+
     public class Sources
     {
         [JsonProperty("source_name")]
