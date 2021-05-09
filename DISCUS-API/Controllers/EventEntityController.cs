@@ -103,7 +103,7 @@ namespace DISCUS_API.Controllers
         /// <param name="neweventEntity">Event</param>
         /// <param name="id">Event ID number</param>
         /// <returns>Event object</returns>
-        [HttpPost("{id}")]
+        [HttpPatch("{id}")]
         public async Task<IActionResult> UpdateEventEntity([FromBody] EventEntity neweventEntity, int id)
         {
             neweventEntity.Id = id; 
@@ -158,7 +158,6 @@ namespace DISCUS_API.Controllers
         /// </summary>
         /// <param name="id">Event ID</param>
         /// <returns>Success or Permission Denied</returns>
-        [Authorize]
         [HttpPatch("Approve/{id}")]
         public async Task<IActionResult> GetEventToApprove(int id)
         {
